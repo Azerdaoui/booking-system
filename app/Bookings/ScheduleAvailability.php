@@ -6,7 +6,6 @@ use App\Models\Employee;
 use App\Models\Service;
 use Carbon\Carbon;
 use Carbon\CarbonPeriod;
-use Spatie\Period\Boundaries;
 use Spatie\Period\Period;
 use Spatie\Period\PeriodCollection;
 use Spatie\Period\Precision;
@@ -19,7 +18,7 @@ class ScheduleAvailability
         protected Employee $employee,
         protected Service $service,
     ) {
-        $this->periods = new PeriodCollection();
+        $this->periods = new PeriodCollection;
     }
 
     public function forPeriod(Carbon $startsAt, Carbon $endsAt)
@@ -34,11 +33,11 @@ class ScheduleAvailability
 
     protected function addAvailabilityFromSchedule(Carbon $date)
     {
-        if (!$schedule = $this->employee->schedules->where('starts_at', '<=', $date)->where('ends_at', '>=', $date)->first()) {
+        if (! $schedule = $this->employee->schedules->where('starts_at', '<=', $date)->where('ends_at', '>=', $date)->first()) {
             return;
         }
 
-        if (![$startsAt, $endsAt] = $schedule->getWorkingHoursFromDate($date)) {
+        if (! [$startsAt, $endsAt] = $schedule->getWorkingHoursFromDate($date)) {
             return;
         }
 
