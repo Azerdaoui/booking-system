@@ -1,13 +1,13 @@
 <?php
 
-use Carbon\Carbon;
-use Inertia\Inertia;
-use App\Models\Service;
-use App\Models\Employee;
-use Illuminate\Support\Facades\Route;
 use App\Bookings\ScheduleAvailability;
-use Illuminate\Foundation\Application;
 use App\Http\Controllers\ProfileController;
+use App\Models\Employee;
+use App\Models\Service;
+use Carbon\Carbon;
+use Illuminate\Foundation\Application;
+use Illuminate\Support\Facades\Route;
+use Inertia\Inertia;
 
 // Carbon::setTestNow(now()->setTimeFromTimeString('12:00'));
 

@@ -2,15 +2,15 @@
 
 namespace App\Bookings;
 
-use Carbon\Carbon;
-use App\Models\Service;
 use App\Models\Employee;
-use Carbon\CarbonPeriod;
-use Spatie\Period\Period;
-use Spatie\Period\Precision;
 use App\Models\ScheduleExclusion;
+use App\Models\Service;
+use Carbon\Carbon;
+use Carbon\CarbonPeriod;
 use Spatie\Period\Boundaries;
+use Spatie\Period\Period;
 use Spatie\Period\PeriodCollection;
+use Spatie\Period\Precision;
 
 class ScheduleAvailability
 {
