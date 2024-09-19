@@ -1,12 +1,15 @@
 <?php
 
-use App\Bookings\ScheduleAvailability;
-use App\Http\Controllers\ProfileController;
-use App\Models\Employee;
-use App\Models\Service;
-use Illuminate\Foundation\Application;
-use Illuminate\Support\Facades\Route;
+use Carbon\Carbon;
 use Inertia\Inertia;
+use App\Models\Service;
+use App\Models\Employee;
+use Illuminate\Support\Facades\Route;
+use App\Bookings\ScheduleAvailability;
+use Illuminate\Foundation\Application;
+use App\Http\Controllers\ProfileController;
+
+// Carbon::setTestNow(now()->setTimeFromTimeString('12:00'));
 
 Route::get('/', function () {
     return Inertia::render('Welcome', [
