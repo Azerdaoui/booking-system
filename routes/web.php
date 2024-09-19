@@ -4,7 +4,6 @@ use App\Bookings\ScheduleAvailability;
 use App\Http\Controllers\ProfileController;
 use App\Models\Employee;
 use App\Models\Service;
-use Carbon\Carbon;
 use Illuminate\Foundation\Application;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
