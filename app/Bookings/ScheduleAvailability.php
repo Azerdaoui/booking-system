@@ -35,10 +35,8 @@ class ScheduleAvailability
 
                 $this->execludeTimePassedToday();
             });
-
-        foreach ($this->periods as $period) {
-            dump($period->asString());
-        }
+        
+        return $this->periods;
     }
 
     protected function execludeTimePassedToday()
