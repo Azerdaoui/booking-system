@@ -1,11 +1,11 @@
 <?php
 
-use Carbon\Carbon;
-use App\Models\Service;
+use App\Bookings\ScheduleAvailability;
 use App\Models\Employee;
 use App\Models\Schedule;
 use App\Models\ScheduleExclusion;
-use App\Bookings\ScheduleAvailability;
+use App\Models\Service;
+use Carbon\Carbon;
 
 it('list correct employee availability', function () {
     Carbon::setTestNow(Carbon::parse('1st january 2000'));
@@ -18,7 +18,7 @@ it('list correct employee availability', function () {
         ->create();
 
     $service = Service::factory()->create([
-        'duration' => 30
+        'duration' => 30,
     ]);
 
     $availability = (new ScheduleAvailability($employee, $service))
@@ -46,7 +46,7 @@ it('accounts for different daily schedule times', function () {
         ->create();
 
     $service = Service::factory()->create([
-        'duration' => 30
+        'duration' => 30,
     ]);
 
     $availability = (new ScheduleAvailability($employee, $service))
@@ -86,7 +86,7 @@ it('does not show availability for schedule execlusiosn', function () {
         ->create();
 
     $service = Service::factory()->create([
-        'duration' => 30
+        'duration' => 30,
     ]);
 
     $availability = (new ScheduleAvailability($employee, $service))
@@ -122,7 +122,7 @@ it('only shows availability from the current time with an hour in advanced', fun
         ->create();
 
     $service = Service::factory()->create([
-        'duration' => 30
+        'duration' => 30,
     ]);
 
     $availability = (new ScheduleAvailability($employee, $service))

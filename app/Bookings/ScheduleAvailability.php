@@ -35,7 +35,7 @@ class ScheduleAvailability
 
                 $this->execludeTimePassedToday();
             });
-        
+
         return $this->periods;
     }
 
