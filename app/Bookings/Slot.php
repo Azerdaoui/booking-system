@@ -20,6 +20,6 @@ class Slot
 
     public function hasEmployees()
     {
-        return !empty($this->employees);
+        return ! empty($this->employees);
     }
 }

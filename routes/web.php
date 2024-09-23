@@ -1,14 +1,13 @@
 <?php
 
-use Inertia\Inertia;
-use App\Models\Service;
-use App\Models\Employee;
-use App\Bookings\SlotRangeGenerator;
-use Illuminate\Support\Facades\Route;
 use App\Bookings\ScheduleAvailability;
-use Illuminate\Foundation\Application;
 use App\Bookings\ServiceSlotAvailability;
 use App\Http\Controllers\ProfileController;
+use App\Models\Employee;
+use App\Models\Service;
+use Illuminate\Foundation\Application;
+use Illuminate\Support\Facades\Route;
+use Inertia\Inertia;
 
 // Carbon::setTestNow(now()->setTimeFromTimeString('12:00'));
 
@@ -34,7 +33,7 @@ Route::get('/', function () {
     );
 
     // dd(
-    //     
+    //
     // );
     // $employee = Employee::find(1);
     // $service = Service::find(1);
@@ -52,4 +51,4 @@ Route::middleware('auth')->group(function () {
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
 });
 
-require __DIR__ . '/auth.php';
+require __DIR__.'/auth.php';

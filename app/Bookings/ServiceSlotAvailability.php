@@ -2,12 +2,11 @@
 
 namespace App\Bookings;
 
-use Carbon\Carbon;
-use App\Bookings\Date;
-use App\Models\Service;
 use App\Models\Employee;
-use Spatie\Period\Period;
+use App\Models\Service;
+use Carbon\Carbon;
 use Illuminate\Support\Collection;
+use Spatie\Period\Period;
 
 class ServiceSlotAvailability
 {
