@@ -2,11 +2,12 @@
 
 namespace App\Bookings;
 
-use App\Models\Employee;
 use Carbon\Carbon;
+use App\Bookings\Date;
 use App\Models\Service;
-use Illuminate\Support\Collection;
+use App\Models\Employee;
 use Spatie\Period\Period;
+use Illuminate\Support\Collection;
 
 class ServiceSlotAvailability
 {
@@ -27,12 +28,27 @@ class ServiceSlotAvailability
             foreach ($periods as $period) {
                 $this->addAvailabilityEmployeeForPeriod($range, $period, $employee);
             }
+
             // remove appointments from the period collection
+
+            // removing empty slots
+            $range = $this->removeEmptySlots($range);
+
             // add the available employees to the range
-            // removing emoty slots
         });
 
         return $range;
+    }
+
+    protected function removeEmptySlots(Collection $range)
+    {
+        return $range->filter(function (Date $date) {
+            $date->slots = $date->slots->filter(function (Slot $slot) {
+                return $slot->hasEmployees();
+            });
+
+            return true;
+        });
     }
 
     protected function addAvailabilityEmployeeForPeriod(
