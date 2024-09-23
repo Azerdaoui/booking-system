@@ -6,7 +6,7 @@ use Carbon\Carbon;
 
 class Slot
 {
-    public $employees = array();
+    public $employees = [];
 
     public function __construct(
         public Carbon $time
