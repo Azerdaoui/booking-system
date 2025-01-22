@@ -5,11 +5,12 @@ use App\Bookings\ServiceSlotAvailability;
 use App\Http\Controllers\ProfileController;
 use App\Models\Employee;
 use App\Models\Service;
+use Carbon\Carbon;
 use Illuminate\Foundation\Application;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
 
-// Carbon::setTestNow(now()->setTimeFromTimeString('12:00'));
+Carbon::setTestNow(now()->setTimeFromTimeString('12:00'));
 
 Route::get('/', function () {
     return Inertia::render('Welcome', [
