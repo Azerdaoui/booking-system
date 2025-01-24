@@ -48,7 +48,7 @@ it('lists multiple slots over more than one day', function () {
     $availablity = (new ServiceSlotAvailability(collect([$employee]), $service))
         ->forPeriod(now()->startOfDay(), now()->addDay()->endOfDay());
 
-    expect($availablity->map(fn($date) => $date->date->toDateString()))
+    expect($availablity->map(fn ($date) => $date->date->toDateString()))
         ->toContain(
             now()->toDateString(),
             now()->addDay()->toDateString()
@@ -86,7 +86,6 @@ it('excludes booked appointments for the employee', function () {
         ->flatten()
         ->toArray();
 
-
     expect($slots)
         ->toContain('11:30:00')
         ->not->toContain('12:00:00')
@@ -122,14 +121,12 @@ it('ignore cancelled appointments', function () {
         ->flatten()
         ->toArray();
 
-
     expect($slots)
         ->toContain('11:30:00')
         ->toContain('12:00:00')
         ->toContain('12:30:00')
         ->toContain('13:00:00');
 });
-
 
 it('show multiple employees available for a service', function () {
     Carbon::setTestNow(Carbon::parse('1st January 2000'));
