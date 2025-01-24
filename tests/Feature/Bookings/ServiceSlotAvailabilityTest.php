@@ -1,19 +1,21 @@
 <?php
 
-use App\Bookings\ScheduleAvailability;
+use App\Bookings\Date;
+use App\Bookings\ServiceSlotAvailability;
+use App\Bookings\Slot;
+use App\Models\Appointment;
 use App\Models\Employee;
 use App\Models\Schedule;
-use App\Models\ScheduleExclusion;
 use App\Models\Service;
 use Carbon\Carbon;
 
-it('list correct employee availability', function () {
-    Carbon::setTestNow(Carbon::parse('1st january 2000'));
+it('shows available time slots for a service', function () {
+    Carbon::setTestNow(Carbon::parse('1st January 2000'));
 
     $employee = Employee::factory()
         ->has(Schedule::factory()->state([
             'starts_at' => now()->startOfDay(),
-            'ends_at' => now()->addYear()->endOfDay(),
+            'ends_at' => now()->endOfDay(),
         ]))
         ->create();
 
@@ -21,27 +23,21 @@ it('list correct employee availability', function () {
         'duration' => 30,
     ]);
 
-    $availability = (new ScheduleAvailability($employee, $service))
+    $availablity = (new ServiceSlotAvailability(collect([$employee]), $service))
         ->forPeriod(now()->startOfDay(), now()->endOfDay());
 
-    expect($availability->current())
-        ->startsAt(now()->setTimeFromTimeString('09:00:00'))
-        ->toBeTrue()
-        ->endsAt(now()->setTimeFromTimeString('16:30:00'))
-        ->toBeTrue();
+    expect($availablity->first()->date->toDateString())->toEqual(now()->toDateString());
+
+    expect($availablity->first()->slots)->toHaveCount(16);
 });
 
-it('accounts for different daily schedule times', function () {
-    Carbon::setTestNow(Carbon::parse('Monday january 2000'));
+it('lists multiple slots over more than one day', function () {
+    Carbon::setTestNow(Carbon::parse('1st January 2000'));
 
     $employee = Employee::factory()
         ->has(Schedule::factory()->state([
             'starts_at' => now()->startOfDay(),
-            'ends_at' => now()->addYear()->endOfDay(),
-            'monday_starts_at' => '11:00:00',
-            'monday_ends_at' => '16:00:00',
-            'tuesday_starts_at' => '09:00:00',
-            'tuesday_ends_at' => '17:00:00',
+            'ends_at' => now()->endOfYear(),
         ]))
         ->create();
 
@@ -49,86 +45,109 @@ it('accounts for different daily schedule times', function () {
         'duration' => 30,
     ]);
 
-    $availability = (new ScheduleAvailability($employee, $service))
+    $availablity = (new ServiceSlotAvailability(collect([$employee]), $service))
         ->forPeriod(now()->startOfDay(), now()->addDay()->endOfDay());
 
-    expect($availability->current())
-        ->startsAt(now()->setTimeFromTimeString('11:00:00'))
-        ->toBeTrue()
-        ->endsAt(now()->setTimeFromTimeString('15:30:00'))
-        ->toBeTrue();
+    expect($availablity->map(fn($date) => $date->date->toDateString()))
+        ->toContain(
+            now()->toDateString(),
+            now()->addDay()->toDateString()
+        );
 
-    $availability->next();
+    expect($availablity->first()->slots)->toHaveCount(16);
 
-    expect($availability->current())
-        ->startsAt(now()->addDay()->setTimeFromTimeString('09:00:00'))
-        ->toBeTrue()
-        ->endsAt(now()->addDay()->setTimeFromTimeString('16:30:00'))
-        ->toBeTrue();
+    expect($availablity->get(1)->slots)->toHaveCount(16);
 });
 
-it('does not show availability for schedule execlusiosn', function () {
-    Carbon::setTestNow(Carbon::parse('1st january 2000'));
-
-    $employee = Employee::factory()
-        ->has(Schedule::factory()->state([
-            'starts_at' => now()->startOfDay(),
-            'ends_at' => now()->addYear()->endOfDay(),
-        ]))
-        ->has(ScheduleExclusion::factory()->state([
-            'starts_at' => now()->setTimeFromTimeString('12:00:00'),
-            'ends_at' => now()->setTimeFromTimeString('13:00:00'),
-        ]))
-        ->has(ScheduleExclusion::factory()->state([
-            'starts_at' => now()->addDay()->startOfDay(),
-            'ends_at' => now()->addDay()->endOfDay(),
-        ]))
-        ->create();
+it('excludes booked appointments for the employee', function () {
+    Carbon::setTestNow(Carbon::parse('1st January 2000'));
 
     $service = Service::factory()->create([
         'duration' => 30,
     ]);
 
-    $availability = (new ScheduleAvailability($employee, $service))
-        ->forPeriod(now()->startOfDay(), now()->addDay()->endOfDay());
-
-    expect($availability->current())
-        ->startsAt(now()->setTimeFromTimeString('09:00:00'))
-        ->toBeTrue()
-        ->endsAt(now()->setTimeFromTimeString('11:59:00'))
-        ->toBeTrue();
-
-    $availability->next();
-
-    expect($availability->current())
-        ->startsAt(now()->setTimeFromTimeString('13:00:00'))
-        ->toBeTrue()
-        ->endsAt(now()->setTimeFromTimeString('16:30:00'))
-        ->toBeTrue();
-
-    $availability->next();
-
-    expect($availability->valid())->toBeFalse();
-});
-
-it('only shows availability from the current time with an hour in advanced', function () {
-    Carbon::setTestNow(Carbon::parse('1st january 2000 09:15:00'));
-
     $employee = Employee::factory()
         ->has(Schedule::factory()->state([
             'starts_at' => now()->startOfDay(),
-            'ends_at' => now()->addYear()->endOfDay(),
+            'ends_at' => now()->endOfDay(),
+        ]))
+        ->has(Appointment::factory()->for($service)->state([
+            'starts_at' => now()->setTimeFromTimeString('12:00'),
+            'ends_at' => now()->setTimeFromTimeString('13:00'),
         ]))
         ->create();
 
-    $service = Service::factory()->create([
-        'duration' => 30,
-    ]);
-
-    $availability = (new ScheduleAvailability($employee, $service))
+    $availablity = (new ServiceSlotAvailability(collect([$employee]), $service))
         ->forPeriod(now()->startOfDay(), now()->endOfDay());
 
-    expect($availability->current())
-        ->startsAt(now()->setTimeFromTimeString('10:00:00'))
-        ->toBeTrue();
+    $slots = $availablity->map(function (Date $date) {
+        return $date->slots->map(fn (Slot $slot) => $slot->time->toTimeString());
+    })
+        ->flatten()
+        ->toArray();
+
+
+    expect($slots)
+        ->toContain('11:30:00')
+        ->not->toContain('12:00:00')
+        ->not->toContain('12:30:00')
+        ->toContain('13:00:00');
+});
+
+it('ignore cancelled appointments', function () {
+    Carbon::setTestNow(Carbon::parse('1st January 2000'));
+
+    $service = Service::factory()->create([
+        'duration' => 30,
+    ]);
+
+    $employee = Employee::factory()
+        ->has(Schedule::factory()->state([
+            'starts_at' => now()->startOfDay(),
+            'ends_at' => now()->endOfDay(),
+        ]))
+        ->has(Appointment::factory()->for($service)->state([
+            'starts_at' => now()->setTimeFromTimeString('12:00'),
+            'ends_at' => now()->setTimeFromTimeString('12:45'),
+            'cancelled_at' => now(),
+        ]))
+        ->create();
+
+    $availablity = (new ServiceSlotAvailability(collect([$employee]), $service))
+        ->forPeriod(now()->startOfDay(), now()->endOfDay());
+
+    $slots = $availablity->map(function (Date $date) {
+        return $date->slots->map(fn (Slot $slot) => $slot->time->toTimeString());
+    })
+        ->flatten()
+        ->toArray();
+
+
+    expect($slots)
+        ->toContain('11:30:00')
+        ->toContain('12:00:00')
+        ->toContain('12:30:00')
+        ->toContain('13:00:00');
+});
+
+
+it('show multiple employees available for a service', function () {
+    Carbon::setTestNow(Carbon::parse('1st January 2000'));
+
+    $service = Service::factory()->create([
+        'duration' => 30,
+    ]);
+
+    $employees = Employee::factory()
+        ->count(2)
+        ->has(Schedule::factory()->state([
+            'starts_at' => now()->startOfDay(),
+            'ends_at' => now()->endOfDay(),
+        ]))
+        ->create();
+
+    $availablity = (new ServiceSlotAvailability($employees, $service))
+        ->forPeriod(now()->startOfDay(), now()->endOfDay());
+
+    expect($availablity->first()->slots->first()->employees)->toHaveCount(2);
 });
