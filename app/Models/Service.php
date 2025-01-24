@@ -13,7 +13,7 @@ class Service extends Model
     protected function price(): Attribute
     {
         return Attribute::make(
-            get: fn (int $price) => '$' . number_format($price, 2),
+            get: fn (int $price) => '$'.number_format($price, 2),
         );
     }
 
