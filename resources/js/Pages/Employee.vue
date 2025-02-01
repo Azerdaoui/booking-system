@@ -22,7 +22,6 @@
         <div class="grid grid-col-2 md:grid-cols-5 gap-8 mt-6">
             <Service v-for="(service, index) in services" :key="index" :service="service" :href="route('checkout', [service, employee])" />
         </div>
-
     </div>
 </template>
 
