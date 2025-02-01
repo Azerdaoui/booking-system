@@ -23,7 +23,3 @@
         </div>
     </Link>
 </template>
-
-<style scoped>
-
-</style>

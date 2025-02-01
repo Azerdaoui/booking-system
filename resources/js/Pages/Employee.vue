@@ -20,7 +20,7 @@
         <h2 class="text-xl font-medium mt-3">Now choose a service from {{ employee.name }}</h2>
 
         <div class="grid grid-col-2 md:grid-cols-5 gap-8 mt-6">
-            <Service v-for="(service, index) in services" :key="index" :service="service" />
+            <Service v-for="(service, index) in services" :key="index" :service="service" :href="route('checkout', [service, employee])" />
         </div>
 
     </div>
